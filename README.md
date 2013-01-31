@@ -4,6 +4,8 @@ tikal-bugzilla
 Tikal Bugzilla is a customization of Mozilla Bugzilla based on the latest community 3.4 version.
 Tikal Bugzilla has most of community Bugzilla latest features with addition of many new features as well as a whole new 'application like' GUI that enables intuitive and easy to use Bugzilla.
 
+New issues can be opened for Tikal Bugzilla at http://dev.tikalk.com/bugzilla/enter_bug.cgi?product=tikal-alm for component 'bugzilla34'
+
 Bugzilla enhancements list:
 ---------------------------
 
