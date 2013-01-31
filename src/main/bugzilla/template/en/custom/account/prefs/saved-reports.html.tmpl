@@ -1,0 +1,162 @@
+[%# INTERFACE:
+  # queryshare_groups: list of groups the user may share reports with
+  #                    (id, name).
+  # bless_group_ids: list of group ids the user may bless.
+  #%]
+
+[% IF user.can_bless %]
+  <script type="text/javascript"><!--
+    function update_checkbox(group) {
+      var bless_groups = [[% bless_group_ids.join(",") FILTER js %]];
+      var checkbox = document.getElementById(group.name.replace(/share_(\d+)/, "force_$1"));
+
+      if (bz_isValueInArray(bless_groups, group.value)) {
+        checkbox.disabled = false;
+      } else {
+        checkbox.disabled = true;
+        checkbox.checked = false;
+      }
+    } //-->
+  </script>
+[% END %]
+
+<p>Your saved reports are as follows:</p>
+
+<blockquote>
+  <table border="1" cellpadding="3">  
+    <tr>
+      <th>
+        Report
+      </th>
+      <th>
+        Run
+      </th>
+      <th>
+        Edit
+      </th>
+      <th>
+        Forget
+      </th>
+      <th>
+        Show in
+        Menu
+      </th>
+      [% may_share = user.in_group(Param('querysharegroup')) && queryshare_groups.size %]
+      [% IF may_share %]
+        <th>
+          Share With a Group
+        </th>
+      [% END %]
+    </tr>
+    [% FOREACH r = user.reports %]
+      <tr>
+        <td>[% r.name FILTER html %]</td>
+        <td>
+          <a href="report.cgi?[% r.report FILTER html %]&amp;reportname=[% r.name FILTER url_quote %]&amp;reporttype=saved">Run</a>
+        </td>
+        <td>
+          <a href="query.cgi?[% r.report FILTER html %]]&amp;report_based_on=[% r.name FILTER url_quote %]">Edit</a>
+        </td>
+        <td>
+            <a href="report.cgi?action=forget&amp;cmdtype=forget&amp;reportname=[% r.name FILTER url_quote %]">Forget</a>
+        </td>
+        <td align="center">
+          <input type="checkbox" 
+                 name="link_in_footer_[% r.id FILTER html %]"
+                 value="1"
+                 alt="[% r.name FILTER html %]"
+                 [% " checked" IF r.link_in_footer %]>
+        </td>
+        [% IF may_share %]
+          <td>
+            <select name="share_[% r.id FILTER html %]"
+              [% IF user.can_bless %] onchange="update_checkbox(this);"[% END %]>
+              <option value="">Don't share</option>
+              [% FOREACH group = queryshare_groups %]
+                <option value="[% group.id %]"
+                        [% ' selected="selected"' 
+                           IF r.shared_with_group.id == group.id %]
+                >[% group.name FILTER html %]</option>
+              [% END %]
+            </select>
+            [% IF user.can_bless %]
+              <input type="checkbox" id="force_[% r.id FILTER html %]"
+                     name="force_[% r.id FILTER html %]" value="1"
+                     [% " disabled"
+                        IF !bless_group_ids.grep("^$r.shared_with_group.id\$").0
+                     %]>
+              <label for="force_[% r.id FILTER html %]">Add to menu</label>
+            [% END %]
+            [% IF r.shared_with_users %]
+              (shared with [% r.shared_with_users FILTER html %]
+              [%+ r.shared_with_users > 1 ? "users" : "user" %])
+            [% END %]
+          </td>
+        [% END %]
+      </tr>
+    [% END %]
+  </table>
+[% IF user.can_bless %]
+  <p>Note that for every report that has the "Add to menu" selected, a
+     link to the shared report is added to the Saved Reports menu of every user that is
+     a direct member of the group at the time you click Submit Changes.</p>
+[% END %]
+</blockquote>
+
+<p>You may use these reports saved and shared by others:</p>
+
+<blockquote>
+  <table border="1" cellpadding="3">  
+    <tr>
+      <th>
+        Report
+      </th>
+      <th>
+        Shared By
+      </th>
+      <th>
+        Shared To
+      </th>
+      <th>
+        Run
+      </th>
+      <th>
+        Edit
+      </th>
+      <th>
+        Show in
+        Menu
+      </th>
+    </tr>
+    [% found_shared_report = 0 %]
+    [% FOREACH rs = user.reports_available %]
+      [% found_shared_report = 1 %]
+      <tr>
+        <td>[% rs.name FILTER html %]</td>
+        <td>[% rs.user.identity FILTER html %]</td>
+        <td>[% rs.shared_with_group.name FILTER html %]</td>
+        <td>
+          <a href="report.cgi?[% rs.report FILTER html %]&amp;reportname=[% rs.name FILTER url_quote %]&amp;
+          					reporttype=saved&amp;report_group_id=[% rs.group_id FILTER url_quote %]">Run</a>
+        </td>
+        <td>
+          <a href="query.cgi?[% rs.report FILTER html %]&amp;report_based_on=[% rs.name FILTER url_quote %]">Edit</a>
+        </td>
+        <td align="center">
+          <input type="checkbox" 
+                 name="link_in_footer_[% rs.id FILTER html %]"
+                 value="1"
+                 alt="[% rs.name FILTER html %]"
+                 [% " checked" IF rs.link_in_footer %]>
+        </td>
+      </tr>
+    [% END %]
+    [% IF !found_shared_report %]
+      <tr>
+        <td colspan="6" style="text-align: center">
+          &lt;None&gt;
+        </td>
+      </tr>
+    [% END %]
+  </table>
+</blockquote>

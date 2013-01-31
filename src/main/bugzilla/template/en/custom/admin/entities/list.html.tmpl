@@ -1,0 +1,74 @@
+[%# 
+  # Contributor(s): Liya Katz <liya@tikalk.com>
+  #%]
+
+[% PROCESS global/header.html.tmpl
+  title = "Select issue type"
+%]
+
+[% edit_contentlink = BLOCK %]editentities.cgi?action=edit&amp;entity_name=%%name%%[% END %]
+[% delete_contentlink = BLOCK %]editentities.cgi?action=del&amp;entity_name=%%name%%[% END %]
+
+[% columns = [
+     { 
+       name => "value"
+       heading => "Edit Issue Type ..."
+       contentlink => edit_contentlink
+     },
+     { 
+       name => "sortkey"
+       heading => "Sortkey" 
+     },
+   ]
+%]
+
+[% IF Param('usesubtasks') %]
+
+  [% columns.push({
+			       name => 'subtask_policy_name'
+			       heading => 'Subtasks policy'
+			      },
+			      {
+			       name => 'subtask_valid'
+			       heading => 'Subtask validation?'
+			       yesno_field => 1
+			      },
+			      {
+			       name => 'subtasks_list'
+			       heading => 'Template Subtasks list'
+			      },
+     ) %]
+     
+[% END %]
+
+[% columns.push({
+       name => "action"
+       heading => "Action"
+       content => "Delete"
+       contentlink => delete_contentlink
+     }) %]
+
+[% SET overrides.action = {} %]
+[% FOREACH en = entities %]
+  [% IF en.default_entity %]
+    [% overrides.action.name.${en.name} = {
+         override_content => 1
+         content => "(Default Issue Type)"
+         override_contentlink => 1
+         contentlink => undef
+       }
+    %]
+  [% END %]
+
+[% END %]
+
+[% PROCESS admin/table.html.tmpl
+     columns = columns
+     data = entities
+     overrides = overrides
+%]
+
+<p><a href="editentities.cgi?action=add">Add a new Issue Type</a> </p>
+
+
+[% PROCESS global/footer.html.tmpl %]

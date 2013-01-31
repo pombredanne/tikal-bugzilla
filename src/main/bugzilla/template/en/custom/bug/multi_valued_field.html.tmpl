@@ -1,0 +1,80 @@
+[% SET fname = field_name ? field_name : field.name %]
+[% SET width = width ? width : 116 %]
+[% SET height = height ? height : 135 %]
+[% SET fromAutoSearchSize = fromAutoSearchSize ? fromAutoSearchSize : 15 %]
+<div id="items-selector_[% fname %]" class="items-selector">
+	<div>
+		<label for="list-filter"><b>Find: </b></label>
+		<input id="list-filter__[% fname %]" type="text" class="find" />
+	</div>
+	<div class="wrapper">
+		<h3>Available:</h3>
+		<div class="list left">
+			<ul style="" class="connectedSortable ui-sortable">
+			  [% FOREACH legal_value = legal_values %]
+			  	[%# if values list is users list %]
+			  	[% IF userlist %]
+					[% IF legal_value.visible && !valuelogin.contains(legal_value.login).size %]
+					<li id="[% fname %]_[% legal_value.login FILTER html %]" style="" title="[% legal_value.login FILTER html %]" class="ui-state-default">[% legal_value.realname FILTER html %]</li>
+					[% END %]
+				[%# if values are keywords list %] 
+				[% ELSIF keywordslist %]
+			        [% IF !value.contains(legal_value).size %]
+					<li id="[% fname %]_[% legal_value FILTER html %]" style="" title="[% legal_value FILTER html %]" class="ui-state-default">[% legal_value FILTER html %]</li>
+				    [% END %]
+				[% ELSIF fieldslist %]
+			        [% IF !value.contains(legal_value).size %]
+					<li id="[% fname %]_[% legal_value FILTER html %]" style="" title="[% legal_value FILTER html %]" class="ui-state-default">[% (field_descs.${legal_value} || legal_value) FILTER html %]</li>
+				    [% END %]
+			    [% ELSE %]
+				    [% IF !value.contains(legal_value.name).size %]
+					<li id="[% fname %]_[% legal_value.name FILTER html %]" style="" title="[% legal_value.name FILTER html %]" class="ui-state-default">[% legal_value.name FILTER html %]</li>
+				    [% END %]
+				[% END %]
+			  [% END %]
+			</ul>
+		</div>
+	</div>
+	<div class="wrapper">
+		<h3>Selected:</h3>
+		<div class="list right">
+			<ul style="" class="connectedSortable ui-sortable">
+			[% FOREACH v = value %]
+				[%# if values list is users list %]
+			        [% IF userlist %]
+						<li id="[% fname %]_[% v.login FILTER html %]_sel" style="" title="[% v.login FILTER html %]" class="ui-state-default">[% v.realname FILTER html %]</li>
+					[% ELSIF keywordslist %]
+						<li id="[% fname %]_[% v FILTER html %]_sel" style="" title="[% v FILTER html %]" class="ui-state-default">[% v FILTER html %]</li>
+					[% ELSIF fieldslist %]
+						<li id="[% fname %]_[% v FILTER html %]_sel" style="" title="[% v FILTER html %]" class="ui-state-default">[% (field_descs.${v} || v) FILTER html %]</li>
+			        [% ELSE %]
+						<li id="[% fname %]_[% v.name FILTER html %]_sel" style="" title="[% v FILTER html %]" class="ui-state-default">[% v FILTER html %]</li>
+			       	[% END %]
+			[% END %]
+			</ul>
+		</div>
+	</div>
+	<input type="hidden" value="[% IF userlist %][% bug.cc.join(',') FILTER html %][% ELSE %][% value.join(',') FILTER html %][% END %]" name="[% fname %]" id="[% fname %]" />
+</div>
+	
+    	[%#// hide values that should be hidden %]
+    	[% IF !no_hidden_values %]
+	    	[% FOREACH legal_value = legal_values %]
+	            [% SET control_value = legal_value.visibility_value %]
+	            [% SET control_field = field.value_field %]
+	            [% IF (control_field && control_value
+	                   && !bug.${control_field.name}.contains(control_value.name))
+	                  || (fname == "product" && legal_value.disallow_new) %]
+	            <script type="text/javascript">        
+	                toggleValue4MultiComp("[% fname %]_[% legal_value.name FILTER html %]",false);
+				</script>
+        
+	            [% END %]
+	        [% END %]
+	        
+	        <script type="text/javascript">     
+	        [%+ INCLUDE "bug/field-events.js.tmpl" field = field %]
+	        </script>
+	        
+	    [% END %]
+    

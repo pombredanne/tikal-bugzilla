@@ -1,0 +1,312 @@
+[%# 1.0@bugzilla.org %]
+[%# 
+  #
+  # Contributor(s): Miron Gofer <miron@tikalk.com>
+  #					Liya Katz <liya@tikalk.com>
+  #%]
+
+[% PROCESS global/header.html.tmpl %]
+[% debug %]
+	<script language="javascript">
+	function addSubtask(){
+		if(!checkDocfields()) {return;}
+		document.subtasks.action.value="add";
+		document.subtasks.submit();
+	}
+
+	function detachSubtask(subtask_id){
+		if(!checkDocfields()) {return;}
+		document.subtasks.action.value="detach";
+		document.subtasks.detach_subtask.value=subtask_id;
+		document.subtasks.submit();
+	}
+
+	function attachSubtask(){
+		if(!checkDocfields()) {return;}
+		document.subtasks.action.value="attach";
+		document.subtasks.submit();
+	}
+
+	function sortSubtasks(){
+		if(!checkDocfields()) {return;}
+		var subtasks_sort_list = "";
+		var index = document.subtasks.sub_index.value;
+		for(var i=1;i<=index;i++){
+			var entity = eval("document.subtasks.entity"+i+".value");
+			var bug_id = eval("document.subtasks.bug_id"+i+".value");
+			if (bug_id != ""){
+				subtasks_sort_list = subtasks_sort_list + "&nbsp;&nbsp;&nbsp;&nbsp;" + bug_id + "&nbsp;&nbsp;-&nbsp;&nbsp;" + entity + ",";
+			} else {
+				subtasks_sort_list = subtasks_sort_list + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;" + entity + ",";
+			}
+		}
+		document.subtasks.sort_subtask.value = subtasks_sort_list.substring(0,subtasks_sort_list.length-1);
+
+		sortClick();
+	}
+
+	function addTemplate(){
+		if(!checkDocfields()) {return;}
+		document.subtasks.action.value="add_template";
+		document.subtasks.submit();
+	}
+
+	function onCommit() {
+		var index = document.subtasks.sub_index.value;
+		var inputElt = null;
+		for(var i=1;i<=index;i++){
+			var bug_id = eval("document.subtasks.bug_id"+i+".value");
+			if (bug_id == ""){
+				var value = eval("document.subtasks.bug_file_loc"+i+".value");
+				var object = document.getElementById("filePath"+i);
+				//object.innerHTML = "<input type='text' name='bug_file_loc"+i+"' id='bug_file_loc"+i+"' value='"+value+"'>";
+				inputElt = document.createElement("input");
+				inputElt.setAttribute("id", "bug_file_loc" + i);
+				inputElt.setAttribute("type", "text");
+				inputElt.setAttribute("name", "bug_file_loc" + i);
+				inputElt.setAttribute("value", value);
+				object.appendChild(inputElt);
+			}
+		}
+		document.subtasks.action.value="update";
+		document.subtasks.submit();
+	}
+
+	function checkDocfields(){
+		var index = document.subtasks.sub_index.value;
+		for(var i=1;i<=index;i++){
+			var bug_id = eval("document.subtasks.bug_id"+i+".value");
+			if (bug_id == ""){
+				var bug_file_loc = eval("document.subtasks.bug_file_loc"+i+".value");
+				if (bug_file_loc != "") {
+					var ans=confirm("Note! This operation will refresh your browser and remove values from  the '[% Param('url_field_name') %]' fields. Continue?");
+					if (!ans) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	</script>
+
+<form name="subtasks" id="subtasks" method="post" action="editsubtasks.cgi?id=[% parent.bug_id %]">
+
+	[% IF new_message != "" %]
+		<table border=0 cellpadding=4 cellspacing=0 width="100%">
+			<tr><td><font color=red>[% new_message %]</font><td></tr>
+		</table>
+	[% END %]
+	<table border=0 cellpadding=4 cellspacing=0 width="100%">
+		<tr>
+			<td>
+				<b>Subtasks for <a href="show_bug.cgi?id=[% parent.bug_id %]" title="[% parent.short_desc %]">[% parent.bug_id %]</a></b> [% parent.component %]
+			</td>
+			<td valign="middle" align="left" colspan="4"> [% parent.short_desc %] </td>
+			<td valign="middle" align="left"> Status: [% parent.bug_status %] ([% parent.assigned_to.name %]) </td>
+		</tr>
+	</table>
+
+<!-- show subtask table header -->
+	<table  cellspacing="4" cellpadding="0" border="0" width="100%" >
+		<tr>
+			<td><b>#</b></td>
+			<td>&nbsp;</td>
+			<td><b>Id</b></td>
+			<td><b>Type</b></td>
+			<td><b>Assigned To</b></td>
+			<td><b>Priority</b></td>
+			<td><b>[% Param('component_field_name') %]</b></td>
+			<td><b>Status</b></td>
+			<td><b>Summary</b></td>
+			<td><b>[% Param('url_field_name') %]</b></td>
+			<td>&nbsp;</td>
+		</tr>
+
+	<hr>
+	 [% index = 0 %]
+	 [% max_sortkey = 0 %]
+	 [% IF subtasks_list.size == 0 %] [%# If no subtasks defined, add template %]
+		 [% FOREACH subtask = subtasks_template %]
+		 	[% index = index + 1 %]
+	 		[% PROCESS new_line
+	 				index => index
+	 				subtask => subtask
+	 				parent => parent
+	 				users => users
+	 				priorities = choices.priorities
+	 				components => choices.components %]
+		 [% END %]
+	 [% ELSE %]
+		 [% FOREACH subtask = subtasks_list %]
+	 	 	[% index = index + 1 %]
+		 	[% IF subtask.bug_id %][%# If subtask has bug_id - it came from db we link to it but it is not editable %]
+	 		 	[% PROCESS existing_line
+	 				   index => index
+	 				   subtask => subtask %]
+	 			[% max_sortkey = max_sortkey + 1 %]
+		 	[% ELSE %]
+		 		[% PROCESS new_line
+		 				index => index
+		 				subtask => subtask
+		 				parent => parent
+		 				users => users
+		 				priorities = choices.priorities
+		 				components => choices.components %]
+		 	[% END %]
+		 [% END %]
+	[% END %]
+	<input type="hidden" name="sort_key" value="[% max_sortkey %]"/>
+	</table>
+	<!-- Footer -->
+	<table>
+	<tr>
+		<td><B>Attach Subtask</B></td>
+		<td><input name="attach_to" id="attach_to" size="6" value=""> [% IF Param('common_fields_for_subtasks') %](Ignore common fields validation <input type="checkbox" name="ignore_common_valid">)[% END %]</td>
+		<td><input type="button" value="Attach" onClick="attachSubtask()"></td>
+	</tr>
+	<tr>
+		<td><B>Add Subtask:</B></td>
+		<td>
+			<select name="subtask_entities" id="subtask_entities">
+			[% FOREACH entity = subtask_entities %]
+				<option value="[% entity.name %]">[% entity.name %]</option>
+			[% END %]
+			</select>
+		</td>
+		<td><input type="button" value="Add" onClick="addSubtask()"></td>
+	</tr>
+	<tr>
+		<!-- td><input type="button" value="Order subtasks" onClick="sortSubtasks()"></td -->
+		<td colspan=3><input type="button" value="Add template" onClick="addTemplate()"></td>
+	</tr>
+	</table>
+	<table border=0 cellpadding=4 cellspacing=0>
+	<tr>
+		<td><input type="button" value="Commit" onClick="onCommit()"></td>
+		<td valign="top" align="right" colspan="6"><a href="show_bug.cgi?id=[% parent.bug_id %]" >Back to parent issue</a></td>
+		<td valign="top" align="right"><a href="buglist.cgi?field0-0-0=parent_bug_id&type0-0-0=equals&value0-0-0=[% parent.bug_id %]&order=bugs.bug_id&tweak=1">Change&nbsp;Several&nbsp;Issues&nbsp;at&nbsp;Once</a></td>
+	</tr>
+	</table>
+
+	<input type=hidden name="action" value="edit"/>
+	<input type=hidden name="id" value="[% parent.bug_id %]"/>
+	<input type=hidden name="sub_index" id="sub_index" value="[% index %]"/>
+	<input type=hidden name="first" id="first" value="false"/>
+	<input type=hidden name="sort_subtask" id="sort_subtask" value=""/>
+	<input type=hidden name="sorted_sub_list" id="sorted_sub_list" value=""/>
+	<input type="hidden" name="detach_subtask" value=""/>
+
+	</form>
+
+[% PROCESS global/footer.html.tmpl %]
+
+[%############################################################################%]
+[%# Block for new line                                                     #%]
+[%############################################################################%]
+
+[% BLOCK new_line %]
+  <tr>
+	<td align="left"><input type=hidden name="index" value="[% index %]">[% index %]</td>
+	<td align="left"><input type="checkbox" name="relevancy[% index %]" id="relevancy[% index %]" [% subtask.relevancy %]></td>
+	<td><input type=hidden name="bug_id[% index %]" value=""></td>
+	<td>
+		<input type="hidden" name="entity[% index %]" id="entity[% index %]" value="[% subtask.entity %]"><b>[% subtask.entity %]</b></input>
+	</td>
+	<td>
+	[% IF subtask.assigned_to != ""%]
+		[% default_assigned_to = subtask.assigned_to.login %]
+	[% ELSE %]
+		[% default_assigned_to = parent.assigned_to.login %]
+	[% END %]
+	[% IF Param("usemenuforusers") %]
+		[% INCLUDE global/userselect.html.tmpl
+              id => "assigned_to$index"
+              name => "assigned_to$index"
+              value => default_assigned_to
+              size => 30
+              emptyok => 0
+          %]
+	[% ELSE %]
+		<input name="assigned_to[% index %]" id="assigned_to[% index %]" size="32" value="[% default_assigned_to %]"/>
+	[% END %]
+	</td>
+	<td>
+		[% IF subtask.priority != ""%]
+			[% default_priority = subtask.priority%]
+		[% ELSE %]
+			[% default_priority = parent.priority %]
+		[% END %]
+		[% PROCESS "global/select-menu.html.tmpl"
+                   name="priority$index"
+                   multiple = false
+                   options=choices.priority
+                   default=default_priority %]
+	</td>
+	<td>
+		[% IF subtask.component != "" %]
+			[% default_component = subtask.component %]
+		[% ELSE %]
+			[% default_component = parent.component %]
+		[% END %]
+		[% PROCESS "global/select-menu.html.tmpl"
+                   name="component$index"
+                   multiple = false
+                   options=choices.component
+                   default=default_component %]
+	</td>
+	<td><input type=hidden name="bug_status[% index %]" value="NEW">NEW</td>
+
+	[% IF subtask.short_desc != "" %]
+		<td><input type="text" name="short_desc[% index %]" id="short_desc[% index %]" size="[% Param('summary_field_length') %]" value="[% subtask.short_desc %]"></td>
+	[% ELSE %]
+		<td><input type="text" name="short_desc[% index %]" id="short_desc[% index %]" size="[% Param('summary_field_length') %]" value="[% subtask.short_desc_prefix %] "></td>
+	[% END %]
+
+	<td nowrap><div id="filePath[% index %]"><input type="file" name="bug_file_loc[% index %]" id="bug_file_loc[% index %]" size="20" value="[% subtask.bug_file_loc %]"></div></td>
+  </tr>
+[% END %]
+
+[%############################################################################%]
+[%# Block for existing line                                                #%]
+[%############################################################################%]
+
+[% BLOCK existing_line %]
+  <tr>
+	<td>
+		<input type=hidden name="index" value="[% index %]">[% index %]
+	</td>
+	<td align="left">
+		<input type=hidden name="relevancy[% index %]" [% subtask.relevancy %]>
+	</td>
+	[% IF subtask.bug_status == "RESOLVED" || subtask.bug_status == "VERIFIED" || subtask.bug_status == "CLOSED" %]
+		<td><input type=hidden name="bug_id[% index %]" value="[% subtask.bug_id %]"><a href="show_bug.cgi?id=[% subtask.bug_id %]" title="[% subtask.short_desc %]"><STRIKE>[% subtask.bug_id %]</STRIKE></td>
+	[% ELSE %]
+		<td><input type=hidden name="bug_id[% index %]" value="[% subtask.bug_id %]"><a href="show_bug.cgi?id=[% subtask.bug_id %]" title="[% subtask.short_desc %]">[% subtask.bug_id %]</td>
+	[% END %]
+	<td>
+		<input type=hidden name="entity[% index %]" value="[% subtask.entity %]">[% subtask.entity %]
+	</td>
+	<td nowrap>
+		<input type=hidden name="assigned_to[% index %]" value="[% subtask.assigned_to.login %]">[% subtask.assigned_to.name %]
+	</td>
+	<td>
+		<input type=hidden name="priority[% index %]" value="[% subtask.priority %]">[% subtask.priority %]
+	</td>
+	<td nowrap>
+		<input type=hidden name="component[% index %]" value="[% subtask.component %]">[% subtask.component %]
+	</td>
+	<td>
+		<input type=hidden name="bug_status[% index %]" value="[% subtask.bug_status %]">[% subtask.bug_status %]
+	</td>
+	<td>
+		<input type=hidden name="short_desc[% index %]" value="[% subtask.short_desc %]">[% subtask.short_desc %]
+	</td>
+	<td>
+		<input type=hidden name="bug_file_loc[% index %]" value="[% subtask.bug_file_loc %]"><a href="[% subtask.bug_file_loc %]" title="[% subtask.bug_file_loc %]" target="_blank">[% subtask.bug_file_loc_cut %]
+	</td>
+	<td><input type="button" value="Detach" onClick="detachSubtask([% subtask.bug_id %])"></td>
+	</tr>
+[% END %]

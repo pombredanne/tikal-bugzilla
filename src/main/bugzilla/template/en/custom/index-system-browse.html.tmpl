@@ -1,0 +1,87 @@
+
+<!-- part left starts -->
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+	<tr>
+		<td valign="top">
+			[% IF per_field != 'NONE' %] 
+				[% m_top_total = 0 %] 
+				[% FOREACH pp = products_info %] 
+					[% FOREACH field = pp.info %] 
+						[%	m_top_total_tmp = field.opened + field.total %] 
+						[% IF m_top_total_tmp > m_top_total %] 
+							[% m_top_total = m_top_total_tmp %] 
+						[% END %] 
+					[% END %]
+				[% END %]
+
+				<table border="0" cellpadding="3" cellspacing="0" width="100%"
+					height="100%">
+					<th>[% Param('product_field_name') %]s statistics per [% per_field_name FILTER html %] (<span style="background-color: #ea9d41">Open</span>|<span style="background-color: #b0b0b0">Total</span> [% terms.bugs %]):</th>
+					[% FOREACH pp = products_info %]
+					<tr>
+						<td>
+						[% pp_count = loop.count() %] 
+						
+						[% PROCESS browse/browse_header.html.tmpl
+							title = "test"
+							url = "browse.cgi?action=browse&product=$pp.name"
+							urlDesc = pp.name
+							tableStyle="pane_wrap_home"
+							classStyle= "home_pane_wrap_content"
+						%]
+		
+						<table border="0" cellpadding="0" cellspacing="0" width="90%">
+							[% total = pp.info.size %] 
+							[% FOREACH field = pp.info %] 
+								[% count = loop.count() %]
+								<tr>
+									<td class="chart_title" nowrap><a href="javascript:gotoURL('buglist.cgi?query_format=advanced&product=[% pp.name %]&[% per_field FILTER html %]=[% field.name %]&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED')">[% field.name %]</a></td>
+									<td>
+									<table id="chart-[% pp_count %]-[% count %]" class="chart" cellpadding=0 cellspacing=1>
+										<tr>
+											<td>
+											<table id="bar-[% pp_count %]-[% count %]-1" cellpadding=0 cellspacing=0>
+												<tr>
+													<td class="bar">
+													<div class="chart_label"></div>
+													</td>
+												</tr>
+											</table>
+											</td>
+											<td>
+											<table id="bar-[% pp_count %]-[% count %]-2" cellpadding=0 cellspacing=0>
+												<tr>
+													<td class="bar">
+													<div class="chart_label"></div>
+													</td>
+												</tr>
+											</table>
+											</td>
+										</tr>
+									</table>
+									</td>
+									<script language="javascript">
+										<!--
+										var categories = new Array();
+										categories[0] = [% field.opened FILTER html %];
+										categories[1] = [% field.total FILTER html %];
+										categories[2] = 300;
+										var top = 0;
+										setChartByTop("chart-[% pp_count %]-[% count %]", top);
+										var bars = calcBarChart(categories, 300);
+										drawBarDark("bar-[% pp_count %]-[% count %]-1", bars[0], categories[0]);
+										drawBarLight("bar-[% pp_count %]-[% count %]-2", bars[1]-bars[0], categories[1]);
+										//-->
+									  </script>
+								</tr>
+							[% END %]
+						</table>
+						[% PROCESS browse/browse_footer.html.tmpl %]</td>
+					</tr>
+					[% END %]
+					<!--/tr-->
+				</table>
+			[% END %]
+		</td>
+	</tr>
+</table>

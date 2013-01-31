@@ -1,0 +1,41 @@
+[% #
+  # Contributor(s): Liya Katz <liya@tikalk.com>
+  #				  : Miron Gofer <miron@tikalk.com>
+  #%]
+
+[% PROCESS global/header.html.tmpl
+  title = "Delete issue type"
+%]
+
+<table border=1 cellpadding=4 cellspacing=0>
+<tr bgcolor="#c8c8c8">
+  <th valign="top" align="left">Field</th>
+  <th valign="top" align="left">Value</th>
+
+</tr><tr>
+  <td valign="top">Issue Type:</td>
+  <td valign="top">[% entity.value FILTER html %]</td>
+
+</tr>
+
+</table>
+[% IF entity.bug_count == 0 %]
+<h2>Confirmation</h2>
+
+<p>Do you really want to delete this issue type?</p>
+<form method=post action="editentities.cgi">
+  <input type=submit value="Yes, delete">
+  <input type=hidden name="action" value="delete">
+  <input type=hidden name="entity_name" value="[% entity.value FILTER html %]">
+  <input type="hidden" name="token" value="[% token FILTER html %]">
+</form>
+
+<hr>
+<a href="editentities.cgi">Edit</a> more issue types.
+[% ELSE %]
+<p>There are [% entity.bug_count %] issues with this issue type - can not be deleted!</p>
+<hr>
+<a href="editentities.cgi">Edit more issue types</a> 
+
+[% END %]
+[% PROCESS global/footer.html.tmpl %]

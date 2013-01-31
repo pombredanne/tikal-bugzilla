@@ -1,0 +1,265 @@
+[%# 1.0@bugzilla.org %]
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Liya Jan <liya@tikalk.com>
+  #%]
+
+[% PROCESS global/header.html.tmpl
+	style_urls=["skins/contrib/Tikal/main.css"]
+%]
+
+<form name="browse" id="browse" method="get">
+ <center>
+ <table cellspacing="1" cellpadding="1" border="0" width="90%" height="90%" valign="middle">
+<tr>
+</tr>
+
+<tr>
+	[% ########################### Main browse ###########################%]
+	[% IF action == "browse" %]
+	<td>
+		<table border="0" cellpadding="4" cellspacing="0" width="90%" style="background-color: #FFFFFF;">
+		<tr>
+		<td valign="top" width="25%">
+			<table class="browser_title" border="0" cellpadding="0" cellspacing="2" >
+			<tr>
+				<th>[% Param('product_field_name') %]:</th><td>[% product FILTER html %]</td>
+			</tr>
+			<tr>
+				<th>Description:</th><td>[% product_desc FILTER html %]</td>
+			</tr>
+			<tr>
+				<th>URL:</th><td>[% product_url FILTER html %]</td>
+
+			</tr>
+			</table>
+		</td>
+
+		<td valign="top" >
+
+			<table class="browser_title" border="0" cellpadding="0" cellspacing="2" >
+			<TR>
+				<Th>Open</Th>
+				<TD id="bar-1" class="bar">&nbsp;</TD>
+			</TR>
+			<TR>
+				<Th>Resolved</Th>
+				<TD id="bar-2" class="bar">&nbsp;</TD>
+			</TR>
+			<TR>
+				<Th>Closed</Th>
+				<TD id="bar-3" class="bar">&nbsp;</TD>
+			</TR>
+			</TABLE>
+
+			<SCRIPT LANGUAGE="JavaScript">
+			<!--
+
+
+			var categories = new Array();
+			categories[0] = [% total_opened FILTER html %];
+			categories[1] = [% total_resolved FILTER html %];
+			categories[2] = [% total_closed FILTER html %];
+			var top = 0;
+			setChartByTop("chart-1", top);
+			var bars = calcBarChart(categories, 170);
+			drawBarOutline("bar-1", bars[0], categories[0]);
+			drawBarOutline("bar-2", bars[1], categories[1]);
+			drawBarOutline("bar-3", bars[2], categories[2]);
+
+			//-->
+			</SCRIPT>
+
+		</td>
+
+	</tr>
+	</table>
+	</td>
+
+</tr>
+<tr>
+	<td valign="top"  height="100%" width="100%">
+
+
+		<table cellspacing="0" cellpadding="4" border="0" width="100%" height="100%">
+		<tr>
+
+		[% #changing the browse items order by window %]
+		[% newOrder = [ 2, 0, 1, 3, 4] %]
+		[% newList = browse_list %]
+
+		[%- FOREACH browse_item = browse_list -%]
+			[% counter = loop.count() %]
+			[% counter = counter - 1 %]
+			[% idx = newOrder.$counter %]
+			[% bitem = newList.$idx%]
+
+			[% IF bitem.search_field_name == "bug_status" %]
+				[% opened_statuses = "" %]
+				[% resolved_statuses = "" %]
+				[% closed_statuses = "" %]
+			[% ELSE %]
+				[% opened_statuses = "&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED" %]
+				[% resolved_statuses = "&bug_status=RESOLVED&bug_status=VERIFIED" %]
+				[% closed_statuses = "&bug_status=CLOSED" %]
+			[% END %]
+
+			<td height="100%">
+			[% window = bitem.window %]
+			[% max_rows = 7 %]
+			[% index = 1 %]
+
+			[% PROCESS browse/browse_header.html.tmpl
+				title = bitem.browse_by
+				tableStyle="pane_wrap"
+				classStyle= "pane_wrap_content"
+				expandedTemplate="browse_expanded.html.tmpl"
+				expanded_item="product"
+			%]
+
+						<table class="browser_table" cellspacing="0" cellpadding="4" border="0" width="100%" height="100%">
+						<tr>
+							<th style="border-left:0px solid black">&nbsp;</th>
+							<th>open</th>
+							<th>resolved</th>
+							<th>closed</th>
+						</tr>
+				[% total = $window.keys.size %]
+				[% FOREACH key = $window.keys %]
+					[% count = loop.count() %]
+					[%- IF index == max_rows -%]
+						<!-- tr><td></td></tr -->
+						[%- LAST -%]
+					[%- ELSE -%]
+						<tr>
+							<td style="border-left:0px solid black;[% "border-bottom:0px solid black;" IF count == total || count == max_rows - 1 %]">[% key FILTER html %]</td>
+							<td [% "style='border-bottom:0px solid black'" IF count == total || count == max_rows - 1 %] >[% IF $window.$key.opened == "" %] &nbsp; [% ELSE %] <a href="buglist.cgi?query_format=advanced&product=[% product %][% opened_statuses %]&[% bitem.search_field_name FILTER html %]=[% key FILTER html  %] ">[% $window.$key.opened FILTER html %]</a> [% END %]</td>
+							<td [% "style='border-bottom:0px solid black'" IF count == total || count == max_rows - 1 %] >[% IF $window.$key.resolved == "" %] &nbsp; [% ELSE %] <a href="buglist.cgi?query_format=advanced&product=[% product %][% resolved_statuses %]&[% bitem.search_field_name FILTER html %]=[% key FILTER html %]">[% $window.$key.resolved FILTER html  %]</a>[% END %]</td>
+							<td [% "style='border-bottom:0px solid black'" IF count == total || count == max_rows - 1 %] >[% IF $window.$key.closed == "" %] &nbsp; [% ELSE %] <a href="buglist.cgi?query_format=advanced&product=[% product %][% closed_statuses %]&[% bitem.search_field_name FILTER html %]=[% key FILTER html %]">[% $window.$key.closed FILTER html %]</a>[% END %]</td>
+						</tr>
+					[% END %]
+					[% index = index + 1 %]
+				[% END %]
+						</table>
+						</TD>
+
+			[% PROCESS browse/browse_footer.html.tmpl %]
+
+			</td>
+
+
+			[% IF window == "2" %]
+				</tr>
+			</table>
+			</td>
+			</tr><tr>
+				<td height="100%" valign="top">
+				<table cellspacing="0" cellpadding="4" border="0" width="100%" height="100%">
+				<tr>
+
+				[% max_rows = 10 %]
+			[% END %]
+
+		[% END %]
+
+	</tr>
+	</table>
+	</td>
+	</tr>
+</tr>
+	[% ########################### Browse Details  ###########################%]
+	[% ELSE%]
+
+		<td>
+
+			<table>
+			<tr><td><u>[% Param('product_field_name') %]:</u></td><td>[% product %]  - browsed by <u>[% browse_by %]</u></td></tr>
+			<tr><td><u>Description:</u></td><td>[% product_desc %]</td></tr>
+			<tr><td><u>URL:</u></td><td>[% product_url %]</td></tr>
+			</table>
+
+		</td>
+</tr>
+<tr>
+
+		[% IF action == "browse_window" %]
+
+			[% IF search_field_name == "bug_status" %]
+				[% opened_statuses = "" %]
+				[% resolved_statuses = "" %]
+				[% closed_statuses = "" %]
+			[% ELSE %]
+				[% opened_statuses = "&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED" %]
+				[% resolved_statuses = "&bug_status=RESOLVED&bug_status=VERIFIED" %]
+				[% closed_statuses = "&bug_status=CLOSED" %]
+			[% END %]
+
+			<td valign="top">
+				<table cellspacing="0" cellpadding="4" border="0">
+				<tr>
+					<td>
+						<table class="browser_table" cellspacing="0" cellpadding="4" border="0">
+						<tr>
+							<th style="border-left:0px solid black">&nbsp;</th>
+							<th>open</th>
+							<th>resolved</th>
+							<th>closed</th>
+						</tr>
+
+						[% total =  window.keys.size %]
+						[% FOREACH key = window.keys %]
+						[% count = loop.count() %]
+						<tr>
+							<td style="border-left:0px solid black">[% key FILTER html %]</td>
+							<td>[% IF window.$key.opened == "" %]   &nbsp; [% ELSE %] <a href="buglist.cgi?query_format=advanced&product=[% product %][% opened_statuses %]&[% search_field_name FILTER html %]=[% key FILTER html  %] ">[% window.$key.opened   FILTER html %]</a>[% END %]</td>
+							<td>[% IF window.$key.resolved == "" %] &nbsp; [% ELSE %] <a href="buglist.cgi?query_format=advanced&product=[% product %][% resolved_statuses %]&[% search_field_name FILTER html %]=[% key FILTER html %]">[% window.$key.resolved FILTER html %]</a>[% END %]</td>
+							<td>[% IF window.$key.closed == "" %]   &nbsp; [% ELSE %] <a href="buglist.cgi?query_format=advanced&product=[% product %][% closed_statuses %]&[% search_field_name FILTER html %]=[% key FILTER html %]">[% window.$key.closed FILTER html %]</a>[% END %]</td>
+						</tr>
+						[% END %]
+
+						<tr>
+							<td style="border-left:0px solid black;font-size:12"><b>Total:</b></td>
+							<td><a href="buglist.cgi?query_format=advanced&product=[% product %]&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED"><b>[% total_opened FILTER html %]</b></a></td>
+							<td><a href="buglist.cgi?query_format=advanced&product=[% product %]&bug_status=RESOLVED&bug_status=VERIFIED"><b>[% total_resolved FILTER html %]</b></a></td>
+							<td><a href="buglist.cgi?query_format=advanced&product=[% product %]&bug_status=CLOSED"><b>[% total_closed FILTER html %]</b></a></td>
+						</tr>
+						</table>
+
+					</td>
+				</tr>
+				</table>
+			</td>
+</tr>
+<tr>
+	<td><a href="browse.cgi?product=[% product FILTER html %]&action=browse">Back to Browse [% Param('product_field_name') %] [% product %]</a></td>
+</tr>
+
+		[% END %]
+	[% END %]
+
+</table>
+</center>
+</form>
+
+[% PROCESS global/footer.html.tmpl %]
+
+
+
+
+
+

@@ -1,0 +1,99 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Erik Stambaugh <erik@dasbistro.com>
+  #%]
+
+[%# INTERFACE:
+  # subject: subject line of message
+  # body: message body, shown before the query tables
+  # queries: array of hashes containing:
+  #     bugs: array containing hashes of fieldnames->values for each bug
+  #     title: the title given in the whine scheduling mechanism
+  # author: user object for the person who scheduled this whine
+  # recipient: user object for the intended recipient of the message
+  #%]
+
+[% PROCESS global/variables.none.tmpl %]
+[% PROCESS 'global/field-descs.none.tmpl' %]
+[% field_descs.short_short_desc     = "Summary" %]
+[% field_descs.short_desc           = "Full Summary" %]
+[% field_descs.assigned_to_realname = "Assignee Realname" %]
+[% field_descs.reporter_realname    = "Reporter Realname" %]
+[% field_descs.qa_contact_realname  = "$qacontact_field_name Realname" %]
+[% field_descs.resolver_realname    = "Resolver Realname" %]
+[% field_descs.bug_id    = "ID" %]
+[% field_descs.bug_severity    = "Pri" %]
+[% field_descs.priority    = "Pri" %]
+[% field_descs.rep_platform    = "Plt" %]
+[% field_descs.assigned_to    = "Assignee" %]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>
+      [[% terms.Bugzilla %]] [% subject FILTER html %]
+    </title>
+  </head>
+  <body bgcolor="#FFFFFF">
+
+    <p align="left">
+      [% body FILTER html %]
+    </p>
+
+    <p align="left">
+      [% IF author.login == recipient.login %]
+        <a href="[%+ urlbase FILTER html %]editwhines.cgi">Click
+            here to edit your whine schedule</a>
+      [% ELSE %]
+        This search was scheduled by [% author.login FILTER html %].
+      [% END %]
+    </p>
+
+
+[% FOREACH query=queries %]
+
+  <h2>[%+ query.title FILTER html %]</h2>
+
+  <table width="100%">
+    <tr>
+	[% FOREACH field = fields_list %]
+		<th align="left">[% (field_descs.${field} || field) FILTER html %]</th>
+ 	[% END %]
+    </tr>
+
+    [% FOREACH bug=query.bugs %]
+      <tr>
+	  [% FOREACH id = fields_list %]
+		[% SWITCH id %]
+		   [% CASE "bug_id" %]
+        			<td align="left"><a href="[%+ Param('urlbase') FILTER html %]show_bug.cgi?id=[%bug.bug_id%]">[% bug.bug_id %]</a></td>
+		   [% CASE "parent_bug_id" %]
+        			<td align="left"><a href="[%+ Param('urlbase') FILTER html %]show_bug.cgi?id=[%bug.parent_bug_id %]">[% bug.parent_bug_id %]</a></td>
+		   [% CASE DEFAULT %]
+        			<td align="left">[% bug.$id FILTER html %]</td>
+		[% END %]
+	  [% END %]
+      </tr>
+    [% END %]
+  </table>
+[% END %]
+
+  </body>
+</html>
+
+

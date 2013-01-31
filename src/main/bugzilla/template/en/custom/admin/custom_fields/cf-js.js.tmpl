@@ -1,0 +1,77 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is NASA.
+  # Portions created by NASA are Copyright (C) 2008 
+  # San Jose State University Foundation. All Rights Reserved.
+  #
+  # Contributor(s): Max Kanat-Alexander <mkanat@bugzilla.org>
+  #%]
+
+var select_values = new Array();
+[% USE Bugzilla %]
+[% FOREACH sel_field = Bugzilla.get_fields({ is_select => 1 }) %]
+	[% IF sel_field.name == "component" || sel_field.name == "version" %]
+    	[% SET legal_values =  sel_field.legal_values_with_product %]
+    [% ELSIF sel_field.custom %]
+    	[% SET legal_values =  sel_field.active_legal_values %]
+    [% ELSE %]
+    	[% SET legal_values =  sel_field.legal_values %]
+    [% END %]
+  select_values[[% sel_field.id FILTER js %]] = [
+  [% FOREACH legal_value = legal_values %]
+    [[% legal_value.id FILTER js %], '[% legal_value.name FILTER js %]'][% ',' UNLESS loop.last %]
+  [% END %]
+  ];
+[% END %]
+
+function onChangeType(type_field) {
+    var value_field = document.getElementById('value_field_id');
+    if (type_field.value == [% constants.FIELD_TYPE_SINGLE_SELECT %]
+        || type_field.value == [% constants.FIELD_TYPE_MULTI_SELECT %])
+    {
+        value_field.disabled = false;
+        document.getElementById('system_table').disabled = false;
+    }
+    else {
+        value_field.disabled = true;
+        document.getElementById('system_table').disabled = true;
+    }
+}
+
+function onChangeVisibilityField() {
+    var vis_field = document.getElementById('visibility_field_id');
+    var vis_value = document.getElementById('visibility_value_id');
+
+    if (vis_field.value) {
+        var values = select_values[vis_field.value];
+        bz_populateSelectFromArray(vis_value, values);
+    }
+    else {
+        bz_clearOptions(vis_value);
+    }
+}
+
+
+// Disable a checkbox (and one of the radio buttons, and the default value input field) based on the state of another one.
+function toggleCheckbox(this_checkbox, other_checkbox_id, toggle_default_value, radio_id) {
+    var other_checkbox = document.getElementById(other_checkbox_id);
+    other_checkbox.disabled = !this_checkbox.checked;
+    if (radio_id) {
+	    var radio = document.getElementById(radio_id);
+	    radio.disabled = !this_checkbox.checked;
+    }
+    if (toggle_default_value){
+    	var def_value_field = document.getElementById("default_value");
+    	def_value_field.disabled = !this_checkbox.checked;
+    }
+}

@@ -1,0 +1,218 @@
+/*BODY, P
+{
+	BACKGROUND-IMAGE: none;
+	COLOR: #FF7D00;
+	FONT-FAMILY: Tahoma;
+	FONT-SIZE: 12px;
+	TEXT-ALIGN: left;
+	background-color : #F7F7F7;
+}*/
+
+A.clickit
+{
+	text-decoration:underline;
+	cursor: pointer;
+}
+TD.BUTTONS
+{
+	COLOR: Blue;
+	FONT-FAMILY: Verdana;
+	FONT-SIZE: 16px;
+	TEXT-DECORATION: none;
+	cursor: pointer;
+	font-weight : bold;
+}
+
+select {
+	COLOR: #343434;
+	FONT-FAMILY: Tahoma;
+	FONT-SIZE: 12px;
+	TEXT-ALIGN: left;
+
+}
+
+option {
+	COLOR: #343434;
+	FONT-FAMILY: Tahoma;
+	FONT-SIZE: 12px;
+	TEXT-ALIGN: left;
+}
+
+/* panes */
+
+table#pane_wrap {
+	/*background-image:url(../images/pane_bg.jpg);
+	background-repeat: repeat;*/
+	background-color: #EEEEEE;
+	border:1px solid #4C5576;
+	width:100%;
+	height:100%;
+}
+
+table#pane_wrap td{
+	font-size:13px;
+	font-family: Verdana;
+	font-weight: normal;
+	color: #ea9d41;
+}
+
+table#pane_wrap_home {
+	/*background-image:url(../images/pane_bg.jpg);
+	background-repeat: repeat;*/
+	background-color: #EEEEEE;
+	border:1px solid #4C5576;
+	width:100%;
+	height:100%;
+}
+
+table#pane_wrap_home td{
+	font-size:13px;
+	font-family: Verdana;
+	font-weight: normal;
+	color: #4C5576;
+}
+
+table#pane_wrap_content {
+	border:1px solid #4C5576;
+	width:100%;
+	height:100%;
+	background-color: white;
+	font-size:13px;
+	font-family: Verdana;
+	font-weight: normal;
+	color: #4C5576;
+}
+
+
+/* -------------  Browser --------------*/
+.bar {
+	font-family:Tahoma;
+	font-size:8px;
+	font-weight:bold;
+	padding-left:2px;
+	height:18px;
+	color:#FFFFFF;
+}
+
+.chart th {
+	color: #4C5576;
+	font-family:Tahoma;
+	font-size:8px;
+	text-align:right;
+	font-weight:normal;
+	padding-left:2px;
+
+}
+
+.chart_title {
+	color: #4C5576;
+	font-family: Verdana;
+	font-size:8px;
+	font-weight:normal;
+	width:70px;
+}
+
+.browser_table th {
+	font-weight:normal;
+	font-family:Tahoma;
+	font-size:12px;
+	text-align:center;
+	border-bottom:1px solid #C7C7C7;
+		border-left:1px solid #C7C7C7;
+}
+
+.browser_table td {
+	font-family:Tahoma;
+	font-size:10px;
+	text-align:center;
+	border-bottom:1px solid #C7C7C7;
+	border-left:1px solid #C7C7C7;
+}
+
+.browser_title td {
+	font-family:Tahoma;
+	font-size:10px;
+	text-align:left;
+	padding-left:5px;
+}
+
+.chart_label {
+	text-align:right;
+	color:#FFFFFF;
+	font-size:10px;
+}
+
+.browser_title th {
+	color: #4C5576;
+	font-family:Tahoma;
+	font-size:12px;
+	font-weight:normal;
+	text-align:Left;
+}
+
+/* -------------  Home --------------*/
+table#home_pane_wrap_user td{
+	background-color: white;
+	color: #4C5576;
+	font-size:10px;
+	font-family: Verdana;
+	font-weight: normal;
+}
+
+table#home_pane_wrap_content {
+	border:1px solid #4C5576;
+	width:100%;
+	background-color: white;
+	color: #4C5576;
+	font-size:10px;
+	font-family: Verdana;
+	font-weight: normal;
+
+}
+
+.home_table th {
+	font-weight:normal;
+	font-family:Tahoma;
+	font-size:10px;
+	text-align:center;
+}
+
+.home_table td {
+	font-family:Tahoma;
+	font-size:8px;
+
+}
+
+.home_title td {
+	font-family:Tahoma;
+	font-size:8px;
+	text-align:left;
+	padding-left:4px;
+}
+
+.home_title th {
+	color: #4C5576;
+	font-family:Tahoma;
+	font-size:10px;
+	font-weight:normal;
+	text-align:Left;
+}
+
+/*-------------   Home box  --------------*/
+.box_bg {
+	background-image: url(../images/bg_h_box.jpg);
+	background-color:#FFFFFF;
+	background-repeat:repeat-y;
+	background-position:right center;
+}
+.box_title {
+	font-family:Tahoma;
+	font-size:12px;
+	font-weight:bold;
+	color:#3a4970;
+}
+
+/* ------------  ext js menu ------------ */
+.topSearchMenu {
+	overflow:auto;
+}

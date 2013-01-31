@@ -1,0 +1,60 @@
+
+<tr>
+	<td valign="top">
+
+	<table id="home_pane_wrap_user" border="0" cellpadding="0" cellspacing="0" height="100%">
+		<tr>
+			<td height="100%">
+
+			<table id="home_pane_wrap_user" border="0" cellpadding="0" cellspacing="0" height="100%">
+				<th style="text-align: left"><a href="[% query %]"><b>[% query_name %] ([% bugs_list.size %] issues)</b></th>
+				<tr>
+					<td height="100%" valign="top">
+					<table class="bz_buglist_plane" cellspacing="0" cellpadding="4"	width="100%">
+						<tr>
+							<td align="left" class="bz_id_column" style="border-bottom: 1px solid #EA9D41"><b>ID</b></td>
+							<td align="left" style="border-bottom: 1px solid #EA9D41"><b>Status</b></td>
+							<td align="left" style="border-bottom: 1px solid #EA9D41"><b>Summary</b></td>
+						</tr>
+						[% total = bugs_list.size %] 
+						[% IF total > 0 %]
+							[% index = 1 %] 
+							[% FOREACH user_bug = bugs_list %] 
+								[% count = loop.count() %]
+								<tr>
+									[%- IF index == max_rows -%]
+										<td class="bz_id_column"><a href="[% query %]"><b>...</b></a></td>
+									[%- LAST -%] 
+									[%- ELSE -%]
+										<td class="bz_id_column [% " style='border-bottom: 0px solid black;' " IF count==total || count==max_rows - 1 %]" >
+											<a href="show_bug.cgi?id=[% user_bug.bug_id %]">[%	user_bug.bug_id %]</a>
+										</td>
+										<td align="left" [% "style='border-bottom: 0px solid black' " IF count== total || count==max_rows - 1 %] >
+										    [%	user_bug.status %]
+										</td>
+										<td align="left" [% "style='border-bottom: 0px solid black' " IF count== total || count==max_rows - 1 %] >
+											[%	user_bug.summary %]
+										</td>
+									[% END %]
+								</tr>
+								[% index = index + 1 %] 
+							[% END %]
+						[% ELSE %]
+							<tr>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+							</tr>
+						[% END %]
+					</table>
+					</td>
+				</tr>
+			</table>
+
+			</td>
+		</tr>
+	</table>
+	</td>
+</tr>
+

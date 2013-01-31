@@ -1,0 +1,173 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Gervase Markham <gerv@gerv.net>
+  #                 Frédéric Buclin <LpSolit@gmail.com>
+  #%]
+
+[%# INTERFACE:
+  # tabs: List of hashes. May not be empty. Each hash has three members:
+  #   name: string. Name of the tab (used internally.)
+  #   description: string. Description of the tab (used in tab title).
+  #   saveable: boolean. True if tab has a form which can be submitted.
+  #               True if user is not receiving self-generated mail.
+  # Note: For each tab name, a template "prefs/${tab.name}.tmpl" must exist, 
+  # and its interface must be fulfilled.
+  # current_tab: A direct reference to one of the hashes in the tabs list.
+  #              This tab will be displayed.
+  # changes_saved: boolean/string. True if the CGI processed form data before 
+  #                displaying anything, and can contain an optional custom
+  #                message if required (which Perl still evaluates as True).
+  # dont_show_button: boolean. Prevent the display of the "Submit Changes" button.
+  #%]
+
+[% filtered_login = user.login FILTER html %]
+[% PROCESS global/header.html.tmpl
+   title = "User Preferences"
+   subheader = filtered_login
+   style_urls = ['skins/standard/admin.css']
+   javascript_urls = ['js/util.js']
+   doc_section = "userpreferences.html"
+   onload = "toggleBoxesOptions('left_top','left_bottom');
+   			 toggleBoxesOptions('left_bottom','');
+             toggleBoxesOptions('right_top','right_bottom');
+             toggleBoxesOptions('right_bottom','');"
+ %]
+ 
+ <script type="text/javascript">
+   	function toggleBoxesOptions(box_select_id,bottom_select_id) {
+   		 var box_type_select = document.getElementById(box_select_id+"_type");
+   		 if (box_type_select) {
+   			var box_select = document.getElementById(box_select_id);
+   			// enable/disable saved searches list
+	   		if (box_type_select.options[box_type_select.selectedIndex].value  == "[% constants.USER_HOMEPAGE_TYPE_USER_SAVED_SEARCH FILTER html %]") {
+				box_select.disabled = false;   		
+	   		} else {
+	   			box_select.selectedIndex = 0;
+	   			box_select.disabled = true;
+	   		}
+	   		// disable bottom box if System Browse is choosen
+	   		if (bottom_select_id != '') {
+	   	    	var bottom_type_select = document.getElementById(bottom_select_id+"_type");
+		   		if (box_type_select.options[box_type_select.selectedIndex].value  == "[% constants.USER_HOMEPAGE_TYPE_SYSTEM_BROWSE FILTER html %]") {
+		   			bottom_type_select.selectedIndex = 0;
+		   			bottom_type_select.disabled = true;
+		   			bottom_select = document.getElementById(bottom_select_id);
+		   			bottom_select.selectedIndex = 0;
+	   				bottom_select.disabled = true;
+		   		} else {
+		   			bottom_type_select.disabled = false;
+		   		}
+	   	    }
+   		}
+   	    
+	}
+	function checkBoxes() {
+		if (document.getElementById('left_top')){
+			var arr = new Array("left_top","left_bottom","right_top","right_bottom");
+			for (i=0;i<arr.length;i++) {
+				var type_box = document.getElementById(arr[i]+"_type");
+				var box = document.getElementById(arr[i]);
+				var name=arr[i].split("_")
+				if (type_box.options[type_box.selectedIndex].value  == "[% constants.USER_HOMEPAGE_TYPE_USER_SAVED_SEARCH FILTER html %]" && 
+				    box.options[box.selectedIndex].value == "") {
+					alert ("Please choose the Saved search you want to appear in "+name[0]+" "+name[1]+" corner in your homepage!" );
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return true;
+		}
+	}
+ </script>
+
+[% tabs = [{ name => "settings", label => "General Preferences",
+              link => "userprefs.cgi?tab=settings", saveable => "1" },
+            { name => "email", label => "Email Preferences", 
+              link => "userprefs.cgi?tab=email", saveable => "1" },
+            { name => "saved-searches", label => "Saved Searches", 
+              link => "userprefs.cgi?tab=saved-searches", saveable => "1" },
+            { name => "saved-reports", label => "Saved Reports", 
+              link => "userprefs.cgi?tab=saved-reports", saveable => "1" },
+			{ name => "homepage", label => "Homepage", 
+              link => "userprefs.cgi?tab=homepage", saveable => "1" },
+            { name => "account", label => "Name and Password",
+              link => "userprefs.cgi?tab=account", saveable => "1" },
+            { name => "permissions", label => "Permissions", 
+              link => "userprefs.cgi?tab=permissions", saveable => "0" } ] %]
+
+[% FOREACH tab IN tabs %]
+  [% IF tab.name == current_tab_name %]
+    [% current_tab = tab %]
+    [% LAST %]
+  [% END %]
+[% END %]
+
+[% WRAPPER global/tabs.html.tmpl
+   tabs        = tabs
+   current_tab = current_tab
+%]
+
+[% IF changes_saved %]
+  <div id="message">
+    The changes to your [% current_tab.label FILTER lower %] have been saved.
+
+    [% IF email_changes_saved %]
+      <p>
+        An email has been sent to both old and new email
+        addresses to confirm the change of email address.
+      </p>
+    [% END %]
+  </div>
+[% END %]
+
+<h3>[% current_tab.label %]</h3>
+
+[% IF current_tab.saveable %]
+  <form name="userprefsform" method="post" action="userprefs.cgi">
+    <input type="hidden" name="tab" value="[% current_tab.name %]">
+    <input type="hidden" name="token" value="[% token FILTER html %]">
+[% END %]
+
+[% PROCESS "account/prefs/${current_tab.name}.html.tmpl" 
+                                     IF current_tab.name.defined %]
+
+[% IF current_tab.saveable %]
+    <input type="hidden" name="dosave" value="1">
+
+    [% UNLESS dont_show_button %]
+      <table>
+        <tr>
+          <td width="150">&nbsp;</td>
+          <td>
+            <input type="submit" id="update" value="Submit Changes" 
+            	onclick="if (checkBoxes()) {
+            				return true;
+            			 } else {
+            			 	return false;
+            			 }">
+          </td>
+        </tr>
+      </table>
+    [% END %]
+  </form>
+[% END %]
+
+[% END %]
+
+[% PROCESS global/footer.html.tmpl %]

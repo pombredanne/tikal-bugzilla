@@ -1,0 +1,125 @@
+ -----
+ Features
+ -----
+ Tikal
+ -----
+ October 2009
+
+Tikal Bugzilla features and enhancements
+
+ * <<"Application like" GUI :>>
+
+   * New look
+   
+   * Dynamic menus
+   
+   * Edit Issue page redesign with actions bars
+   
+   * Add required fields indication (*)  on Create and Edit issue pages
+
+ * <<New Bugzilla Homepage that presents:>>
+ 
+	* Products statistics per target milestone
+
+	* The list of new and open issues for  the logged user
+		[images/homepage.png] Homepage
+
+ * <<Browse Product & Classification>> page - shows information related to
+  product or classification, counts per components, per severity etc.
+
+[images/browse.png] Browse
+
+ * An <<Issue Type (Entity)>> feature, for using Bugzilla as an Issue Tracker to track task, bugs, features and etc.
+
+
+ * <<Subtasks functionality>> - this option helps to split an issue to
+  a number of smaller tasks that can be assigned to different components and users,
+  thus providing a better picture of the progress on the issue.
+  This new feature also allows each party that needs to be involved
+  in resolving the issue to better understand what part of
+  the process they are responsible for.
+  Good example for use of this functionality is the Feature Management.
+
+  Additional features enabled by inclusion of Subtasks:
+
+  	* Issue of any issue type in Bugzilla can have subtasks (defined per issue type).
+
+	* Issue of any issue type in Bugzilla can be a subtask (defined per issue type).
+	
+	* "Template" list of subtasks can be defined for an issue type;
+	  additional subtasks can be added in this case as well.
+
+	* Validation of issue's subtasks on "Resolve" can be "turned on" for an issue type
+	  means that user can not change its status to "Resolved" as long as there are open subtasks for this issue.
+	  
+[images/subtasks.png] Issue Type subtasks policy
+
+	* Ability to see all subtasks of an issue, add more dynamically
+
+[images/subtasks_list.png] Edit Subtasks
+
+ * <<Enhancements to Bugzilla original Custom Fields feature:>>
+
+	* Add 5 types of mandatory indicators:
+		* always
+		* for new issue only
+		* for existing issue only
+		* for resolved fixed issue only
+		* for reopened issues only
+		
+	* Add Entity field to the visibility options 
+	
+	* Add default values for custom fields
+	
+	* Add “system” custom fields:
+		* implemented as custom fields
+		* not displayed in default templates (create and edit issue pages) – should be added in custom templates only
+	
+	* Add “system table” custom fields:
+		* can get data from existing table instead of default (single and multi select fields)
+	
+	* Add custom fields to the Search 
+	
+	* Add multi-valued custom fields to the Search results 
+
+ * <<Enhancements to the Version field>>:
+
+	* Added status to the Version field: Unreleased, Released, Archived 
+
+	* Version field will show only Released versions in the drop-down list of Version on New and Edit Issue pages
+
+	* Archived versions will not be displayed on the New & Edit Issue pages
+
+	* Custom version fields (like Target Version & Fixed In) can be added as 'system_table' custom fields, using versions list.
+
+ * <<More features:>>
+   
+   	* A "View SCM Activity" link, that enables to see all bug related version control activity. Support for multiple viewvc roots (per product)
+
+ 	* CRM Connectivity feature enables to relate bugs to specific CRM Id's (customer ticketing).
+
+	 * 'do not send mail' flag to the "Edit Issue" screen – very useful for minor changes performed on an issue.
+	
+	 * 'Auto-Reassign' feature:
+		
+		* automatically re-assign to the reporter when status changed to RESOLVED
+	
+		* the field 'Resolver' appears in the Edit Issue screen
+	
+		* automatically re-assign to the previous assignee (Resolver) when status changed to REOPENED
+	
+	 * Added an option to make old Components and Milestones “invisible” for new issues, but keep the history issues with correct values.
+	
+	 * Template for new issue description
+	
+	 * Saved reports (like saved searches)
+	 
+	 * Commit check query – can be called from a pre-commit check from version control to verify that bug_id exists and etc.
+	
+	 * Parameter for Summary field length
+	
+	 * Indicators to use : URL, dependency feature
+	
+	 * HTML tags for fields: URL, Product, Component, QA Contact
+	
+	 * Client side validation checks

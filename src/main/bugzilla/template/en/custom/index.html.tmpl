@@ -1,0 +1,94 @@
+[%# -*- mode: html -*- %]
+
+[%# Tikal Bugzilla Home page %]
+
+[% PROCESS global/variables.none.tmpl %]
+
+[% javascript = BLOCK %]
+function addSidebar() {
+  if ((typeof window.sidebar == "object") && (typeof window.sidebar.addPanel == "function"))
+  {
+    var sidebarname=window.location.host;
+    if (!/bug/i.test(sidebarname))
+      sidebarname="[% terms.Bugzilla %] "+sidebarname;
+    window.sidebar.addPanel (sidebarname, "sidebar.cgi", "");
+  }
+  else
+  {
+    var rv = window.confirm ("Your browser does not support the sidebar extension.  " + "Would you like to upgrade now?");
+    if (rv)
+      document.location.href = "http://www.mozilla.org/";
+  }
+}
+function gotoURL(urlP) {
+    if (urlP != null) {
+        window.location.href = urlP;
+    }
+}
+[% END %]
+
+[% PROCESS global/header.html.tmpl
+  title = "$terms.Bugzilla Main Page"
+ style_urls=["skins/contrib/Tikal/main.css","skins/contrib/Tikal/buglist.css"]
+%]
+
+[% max_rows = 10 %]
+
+[% IF user.id %]
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+	<tr>
+		<td valign="top">
+
+			<table cellspacing="0" cellpadding="4" border="0" width="100%" >
+				<tr>
+				   [% FOREACH box IN  ['left_top' 'left_bottom' 'right_top' 'right_bottom'] %]
+						[% IF homepage.${box}.type == constants.USER_HOMEPAGE_TYPE_SYSTEM_BROWSE %]
+							<td valign="top" rowspan="2" >
+							[% PROCESS "index-system-browse.html.tmpl" %]
+							[% NEXT %]
+							</td>
+							
+						[% ELSE %]
+							<td valign="top">
+								[% IF box == 'left_top' || box == 'right_top' %]
+									<table border="0" cellpadding="4" cellspacing="0" height="100%"	width="100%">
+								[% END %]
+								[% IF homepage.${box}.type == constants.USER_HOMEPAGE_TYPE_USER_NEW_ISSUES || 
+									  homepage.${box}.type == constants.USER_HOMEPAGE_TYPE_USER_OPEN_ISSUES ||
+									  homepage.${box}.type == constants.USER_HOMEPAGE_TYPE_USER_SAVED_SEARCH %]
+									  [% PROCESS "index-user-query.html.tmpl" 
+										bugs_list = homepage.${box}.bugs_list,
+										query = homepage.${box}.query
+										query_name =  homepage.${box}.query_name
+									%]
+									
+								[% ELSE %]
+									[%# NONE %]
+									<tr>
+										<td valign="top"></td>
+									</tr>
+								[% END %]
+								[% IF box == 'left_bottom' || box == 'right_bottom' %]
+									</table>
+								[% END %]
+							</td>
+							[% IF box == 'left_bottom' %]
+							<td></td>
+							[% END %]
+						[% END %]
+					[% END %]
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+[% END %]
+
+<script type="text/javascript">
+<!--
+	// -- <form name="f" is under remark
+	// document.forms['f'].id.focus();
+//-->
+</script>
+[% PROCESS global/footer.html.tmpl %]

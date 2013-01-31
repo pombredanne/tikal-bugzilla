@@ -1,0 +1,82 @@
+[%# 1.0@bugzilla.org %]
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distribted on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Miron Gofer <miron@tikalk.com>
+  #					Liya Jan <liya@tikalk.com>
+  #%]
+
+  [% PROCESS global/variables.none.tmpl %]
+
+[% IF bug.has_subtasks() %]
+
+    <tr>
+    	<th class="field_label">
+		    <label for="subtasks_list">Subtasks</label>:
+		</th>
+
+		[% subtasks_display = true #user.settings.subtasks_display.value %]
+
+		<td>
+		    <table cellspacing="0" cellpadding="4" border="1">
+		      <tr>
+		        <th align="center" bgcolor="#cccccc">
+		          ID
+		        </th>
+		        <th align="center" bgcolor="#cccccc">
+		          Type
+		        </th>
+		        <th align="center" bgcolor="#cccccc">
+		          Summary
+		        </th>
+		        <th align="center" bgcolor="#cccccc">
+		          Assigned To
+		        </th>
+		        <th align="center" bgcolor="#cccccc">
+		          Priority
+		        </th>
+		      </tr>
+			  [%- FOREACH sub = bug.subtasks_list  -%]
+			      <tr>
+			        <td align="center" >
+						<a href="show_bug.cgi?id=[% sub.bug_id %]" title="[% sub.short_desc %]">
+						[% IF sub.bug_status == 'RESOLVED' || sub.bug_status == 'VERIFIED' || sub.bug_status == 'CLOSED' %]
+							<STRIKE>[% sub.bug_id %]</STRIKE>
+						[% ELSE %]
+							[% sub.bug_id %]
+						[% END %]
+						</a>
+					</td>
+					<td align="left">[% sub.entity %]</td>
+					<td align="left">[%sub.short_desc %]</td>
+					<td align="left">[% sub.assigned_to.name %]</td>
+					<td align="center">[% sub.priority %]</td>
+			      </tr>
+			  [% END %]
+		      <tr>
+		        <td colspan="5" align="left" style="padding:5"><a href="editsubtasks.cgi?id=[% bug.bug_id %]">Edit Subtasks</a></td>
+		      </tr>
+		    </table>
+	      </td>
+	
+	[% ELSE %]
+	
+		<!--script>
+			document.getElementById("subtasks_arrow").style.display = 'none';
+		</script-->
+	[% END %]
+

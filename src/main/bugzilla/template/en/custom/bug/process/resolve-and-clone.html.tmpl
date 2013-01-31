@@ -1,0 +1,62 @@
+[%# 
+  #%]
+
+[%# INTERFACE:
+  #
+  #%]
+  
+[% PROCESS global/variables.none.tmpl %]
+
+[% PROCESS global/header.html.tmpl
+  title = 'Resolve for one Target Version and Clone for others...' %]
+
+<form name="resolvenclone" action="process_bug.cgi" method="post">
+
+
+[% SET exclude_items = ['resolve-n-clone'] %]
+[% IF verify_bug_groups %]
+  [% exclude_items.push('bit-\d+') %]
+[% END %]
+
+[% PROCESS "global/hidden-fields.html.tmpl"
+     exclude = '^' _ exclude_items.join('|') _ '$' %]
+
+<input type="hidden" name="reporter_id" value="[% bug.reporter.id %]"/>
+<input type="hidden" name="confirm_resolve-n-clone" value="1">
+    
+[% id = cgi.param('id') %]
+<h3>Choose Target Version to resolve. 
+Issue [% id %] will be cloned for the rest of Target Versions.
+<table>
+  <tr>
+    <td>
+      [% cf_list = Bugzilla.cgi.param('cf_target_version') %]
+      [% PROCESS "global/select-menu.html.tmpl" 
+                 name="cf_target_version_resolve"
+                 options=cf_list.split(',')
+                 size=10 %]
+    </td>
+</table>
+
+<input type="submit" id="resolve-n-clone" value="Commit" onclick="checkOnCommit();return false;" >
+
+<script type="text/javascript">
+	function checkOnCommit() {
+	
+		// check that there is a target version chosen to be resolved
+	  	if (document.resolvenclone.cf_target_version_resolve.value == '') {
+	       alert('Please choose target version to be resolved!');
+	       return false; 
+	    }
+		document.resolve-n-clone.submit();
+	}
+</script>
+
+</form>
+<hr>
+
+  Cancel and Return to [% "$terms.bug $id" FILTER bug_link(id) FILTER none %]
+
+[% PROCESS global/footer.html.tmpl %]
+
+ 

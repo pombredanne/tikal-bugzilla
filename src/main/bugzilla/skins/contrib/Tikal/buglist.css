@@ -1,0 +1,34 @@
+/* 
+  */
+
+tr.bz_bugitem:hover {
+    background-color: #ccccff;
+}
+
+/* we use a first-child class and not the pseudo-class because IE
+ * doesn't support it :-( */
+tr.bz_subtasks td.first-child { 
+  background-image: url("images/parent_subtasks.jpg");
+  background-position: center left;
+  background-repeat: no-repeat;
+  background-color: inherit;
+}
+
+th.bz_buglist_header {
+	text-align: left;	
+}
+
+.bz_row_odd {
+    background-color: #F7F7F7;
+    color: #343434;
+}
+
+.bz_row_even {
+    background-color: #FFFFFF;
+    color: #343434;
+}
+
+/* Style bug rows according to severity. */
+.bz_blocker { color: red; font-weight: bold; }
+.bz_critical { color: red; }
+.bz_enhancement { color: #666; background-color: white; }

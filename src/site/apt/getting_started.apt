@@ -1,0 +1,15 @@
+ -----
+ Getting Started
+ -----
+ Tikal
+ -----
+ October 2009
+
+Tikal Bugzilla Installation
+
+ * Download Tikal Bugzilla
+
+ * See README for installation instructions
+
+ * If you are migrating from Tikal Bugzilla based on Bugzilla 2.20, 
+   see UPGRADE_from_Tikal_2.2.txt for instructions.

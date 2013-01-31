@@ -1,0 +1,20 @@
+ -----
+ Overview
+ -----
+ Tikal
+ -----
+ October 2009
+
+Overview
+
+ Tikal Bugzilla based Issue Tracker is a major component of  Tikal's ALM (Application Life Cycle) solution.
+ It's core is based on latest release of Bugzilla 3.4, the most common open source bug tracking system.
+
+ Bugzilla is a good community level tool and is installed in IT departments of about 30 percent of Fortune 500 companies;
+ but in order to perform well it needs to be highly modified.
+
+ Tikal Issue Tracker Bugzilla's community edition latest features
+ with added helpful features and a brand new "application like" GUI
+ that enables intuitive and easy use, compared to bugzilla.
+
+[images/homepage.png] Tikal Bugzilla

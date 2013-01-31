@@ -1,0 +1,78 @@
+[%# INTERFACE:
+  # homepage:      a hash homepage boxes definitions
+  #                left_top_type
+  #				   left_top
+  #				   left_bottom_type
+  #				   left_bottom
+  #				   right_top_type
+  #				   right_top
+  #				   right_bottom_type
+  #				   right_bottom
+  #%]
+
+  [% USE Bugzilla %]
+
+  <table border="0" cellpadding="8">
+  	  [% FOREACH box IN  ['left_top' 'left_bottom' 'right_top' 'right_bottom'] %]
+  	  	[% SET box_type = box _ "_type" %]
+      <tr>
+        <td align="right">
+        [% SWITCH box %]
+		  [%   CASE 'left_top' %]
+			Left Top Corner: 
+		  [%   CASE 'left_bottom' %]
+			Left Bottom Corner: 
+		  [%   CASE 'right_top' %]
+			Right Top Corner: 
+		  [%   CASE 'right_bottom' %]
+			Right Bottom Corner: 
+		[% END %]
+        </td>
+        <td>
+            <select name="[% box %]_type" id="[% box %]_type" onchange="toggleBoxesOptions('[% box %]',[% IF box == 'left_top' %]'left_bottom'[% ELSE %]''[% END %])">
+              <option value="[% constants.USER_HOMEPAGE_TYPE_NONE %]"
+              	[% ' selected="selected"' IF homepage.${box_type} == constants.USER_HOMEPAGE_TYPE_NONE %]>
+                ---
+              </option>
+              [% IF box == 'left_top' %]
+              <option value="[% constants.USER_HOMEPAGE_TYPE_SYSTEM_BROWSE FILTER html %]"
+              	[% ' selected="selected"' IF homepage.${box_type} == constants.USER_HOMEPAGE_TYPE_SYSTEM_BROWSE %]>
+                [% Param('product_field_name') %]s statistics 
+              </option>
+              [% END %]
+              <option value="[% constants.USER_HOMEPAGE_TYPE_USER_NEW_ISSUES FILTER html %]"
+				[% ' selected="selected"' IF homepage.${box_type} == constants.USER_HOMEPAGE_TYPE_USER_NEW_ISSUES %]>
+                New [% terms.bugs %] lists for User [% user.name %] 
+              </option>
+              <option value="[% constants.USER_HOMEPAGE_TYPE_USER_OPEN_ISSUES FILTER html %]"
+              	[% ' selected="selected"' IF homepage.${box_type} == constants.USER_HOMEPAGE_TYPE_USER_OPEN_ISSUES %]>
+                Open [% terms.bugs %]</b></a><b> lists for User [% user.name %]
+              </option>
+			  <option value="[% constants.USER_HOMEPAGE_TYPE_USER_SAVED_SEARCH FILTER html %]"
+              	[% ' selected="selected"' IF homepage.${box_type} == constants.USER_HOMEPAGE_TYPE_USER_SAVED_SEARCH %]>
+                Saved Search
+              </option>
+            </select>
+        </td>
+        <td>
+        	<select name="[% box %]" id="[% box %]">
+        	  <option value="">---</option>
+              [% FOREACH q = user.queries %]
+              	<option value="[% q.name FILTER html %]"
+					[% ' selected="selected"' IF homepage.${box} == q.name %]>
+	                [% q.name FILTER html %]
+	          	</option>
+              [% END %]
+              [%# subscribed queries are not supportted at the moment %]
+              [%# FOREACH q = user.queries_subscribed %]
+              	<!--option value="[% q.name FILTER html %]"
+              		[% ' selected="selected"' IF homepage.${box} == q.name %]>
+	            	[% q.name FILTER html %]
+	            </option-->
+              [%# END %]
+            </select>
+        </td>
+      </tr>
+      [% END %]
+  </table>
+<br>

@@ -1,0 +1,85 @@
+[%# 
+  # Contributor(s): Liya Katz <liya@tikalk.com>
+  #%]
+
+[% PROCESS global/header.html.tmpl
+  title = "Add new issue type"
+%]
+
+<form method=post action="editentities.cgi">
+  <table border=0 cellpadding=4 cellspacing=0>
+    <tr>
+      <th align="right">Issue Type:</th>
+      <td><input size=64 maxlength=64 name="entity_name"></td>
+    </tr>
+    <tr>
+      <th align="right"><label for="sortkey">Sortkey:</label></th>
+      <td><input id="sortkey" size="20" maxlength="20" name="sortkey"
+                 value=""></td>
+    </tr>
+    <tr>
+    	<td></td><td><input type=checkbox name="default_entity" value="1"> Set this issue type as a default</td>
+    </tr>
+    [% IF Param('usesubtasks') %]
+	    <tr><td>&nbsp;&nbsp;</td></tr>
+	    <tr>
+	    	<th align="right">Subtask policy:</th>
+	    	<td>
+	    		<select name="subtask_policy">
+	    			[% FOREACH policy = policies %]
+	    				<option value="[% policy.i %]" [% IF policy.i == 1 %] SELECTED [% END %]>[% policy.name %]</option>
+	    			[% END %]
+	    		</select>
+	    	</td>
+	    </tr>
+	    <tr>
+	    	<th align="right">Subtask validation:</th>
+	    	<td><input type=checkbox name="subtask_valid" value="1"> If an issue of this type should not be RESOLVED FIXED if it has unresolved subtasks</td>
+	    </tr>
+	    <tr>
+	    	<th align="right">Template Subtasks list:</th>
+	    	<td><input size=64 name="subtasks_list" value=""></td>
+	    </tr>
+	    <tr>
+	    	<th align="right"></th>
+	    	<td>(Enter the list of existing issue types separated by comma)</td>
+	    </tr>
+	    <tr>
+	    	<th align="right"></th>
+			<td valign=top rowspan=5>
+				<table style="border:1px solid black">
+					<tr><td colspan=10><u>Defined issue types list:</u></td></tr>
+					<tr>
+						[% count = 0 %]
+						[% FOREACH en = sub_entities %]
+							<td>[% en.name FILTER url_quote %]&nbsp;&nbsp;
+							[% IF count == 7 %] </td></tr><tr><td> [% ELSE %] </td> [% END %]
+						[% END %]
+					</tr>
+				</table>
+			</td>
+		</tr>
+	[% END %]
+
+  </table>
+  <hr>
+  <input type=submit value="Add"
+    	onclick="if (this.form.entity_name.value == '') {
+       				alert('You must enter a name for the Issue Type.');
+          			return false; 
+          		}
+				reWhiteSpace = new RegExp(/\s+/);
+				if (reWhiteSpace.test(this.form.entity_name.value)) {
+	       			alert('No whitespaces are allowed in the Issue Type name.');
+	          		return false;
+	            }
+	          	
+	       		return true;">
+  <input type=hidden name="action" value="new">
+  <input type="hidden" name="token" value="[% token FILTER html %]">
+</FORM>
+
+<hr>
+<a href="editentities.cgi">Edit more issue types</a>
+
+[% PROCESS global/footer.html.tmpl %]

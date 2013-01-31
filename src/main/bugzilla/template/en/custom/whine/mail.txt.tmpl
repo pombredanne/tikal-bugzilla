@@ -1,0 +1,78 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Erik Stambaugh <erik@dasbistro.com>
+  #%]
+
+[%# INTERFACE:
+  # subject: subject line of message
+  # body: message body, shown before the query tables
+  # queries: array of hashes containing:
+  #     bugs: array containing hashes of fieldnames->values for each bug
+  #     title: the title given in the whine scheduling mechanism
+  # author: user object for the person who scheduled this whine
+  # recipient: user object for the intended recipient of the message
+  #%]
+
+[% PROCESS global/variables.none.tmpl %]
+[% PROCESS 'global/field-descs.none.tmpl' %]
+[% field_descs.short_short_desc     = "Summary" %]
+[% field_descs.short_desc           = "Full Summary" %]
+[% field_descs.assigned_to_realname = "Assignee Realname" %]
+[% field_descs.reporter_realname    = "Reporter Realname" %]
+[% field_descs.qa_contact_realname  = "$qacontact_field_name Realname" %]
+[% field_descs.resolver_realname    = "Resolver Realname" %]
+[% field_descs.bug_id    = "ID" %]
+[% field_descs.bug_severity    = "Pri" %]
+[% field_descs.priority    = "Pri" %]
+[% field_descs.rep_platform    = "Plt" %]
+[% field_descs.assigned_to    = "Assignee" %]
+
+[% body %]
+
+[% IF author.login == recipient.login %]
+  To edit your whine schedule, visit the following URL:
+  [%+ urlbase %]editwhines.cgi
+[% ELSE %]
+  This search was scheduled by [% author.login %].
+[% END %]
+
+
+[% FOREACH query=queries %]
+
+[%+ query.title +%]
+[%+ "-" FILTER repeat(query.title.length) %]
+
+
+[% FOREACH bug=query.bugs %]
+[% FOREACH id = fields_list %]
+[% SWITCH id %]
+	[% CASE "bug_id" %]
+  [% terms.Bug +%] [%+ bug.bug_id %]:
+  [%+ Param('urlbase') %]show_bug.cgi?id=[% bug.bug_id +%]
+	[% CASE "parent_bug_id" %]
+  [% terms.Bug +%] [%+ bug.parent_bug_id %]:
+  [%+ Param('urlbase') %]show_bug.cgi?id=[% bug.parent_bug_id +%]
+	[% CASE DEFAULT %]
+  [%+(field_descs.${id} || id)+%]: [%+ bug.$id %]
+[% END %]
+[% END %]
+[% END %]
+
+[% END %]
+
+

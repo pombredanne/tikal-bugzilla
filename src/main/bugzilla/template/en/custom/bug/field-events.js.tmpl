@@ -1,0 +1,65 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is the San Jose State 
+  # University Foundation. Portions created by the Initial Developer
+  # are Copyright (C) 2008 the Initial Developer. All Rights Reserved.
+  #
+  # Contributor(s): Max Kanat-Alexander <mkanat@bugzilla.org>
+  #%]
+
+[%# INTERFACE:
+  #   field: a Bugzilla::Field object
+  #   override_legal_values (optional): The list of legal values, for select fields.
+  #%]
+
+[% FOREACH controlled_field = field.controls_visibility_of %]
+  showFieldWhen('[% controlled_field.name FILTER js %]',
+                '[% field.name FILTER js %]',
+                '[% controlled_field.visibility_value.name FILTER js %]');
+[% END %]
+[% IF override_legal_values %]
+    [% legal_values = override_legal_values %]
+[% ELSIF field.custom %]
+	[% legal_values = field.active_legal_values %]
+[% ELSE %]
+	[% legal_values = field.legal_values %]
+[% END %]
+[% FOREACH legal_value = legal_values %]
+  [% FOREACH controlled_field = legal_value.controlled_values.keys %]
+    [% SET cont_ids = [] %]
+    [% SET cont_names = [] %]
+    [% FOREACH val = legal_value.controlled_values.$controlled_field %]
+      [% cont_ids.push(val.id) %]
+      [% IF (matches = val.name.match('^\d+$')) %]
+      	[% SET vname = val.name %]
+      [% ELSE %]
+      	[% SET vname = "'" _ val.name _ "'" %]
+      [% END %]
+      [% cont_names.push(vname) %]
+    [% END %]
+    
+    [% IF field.type == constants.FIELD_TYPE_MULTI_SELECT %]
+    	showValueWhen('[% controlled_field FILTER js %]',
+	                  [[% cont_ids.join(',') FILTER js %]],
+	                  [[% cont_names.join(',') %]],
+	                  '[% field.name FILTER js %]',
+	                  '[% legal_value.name FILTER js %]');
+    [% ELSE %]
+	    showValueWhen('[% controlled_field FILTER js %]',
+	                  [[% cont_ids.join(',') FILTER js %]],
+	                  [[% cont_names.join(',') %]],
+	                  '[% field.name FILTER js %]',
+	                  [% legal_value.id FILTER js %]);
+	[% END %]
+  [% END %]
+[% END %]
